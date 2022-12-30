@@ -1,0 +1,10 @@
+cmake_minimum_required(VERSION 3.23)
+project(myopencv)
+find_package(OpenCV REQUIRED)
+set(CMAKE_CXX_STANDARD 17)
+INCLUDE_DIRECTORIES(/home/xu736946693/Desktop/myAlgorithm/lib)
+include_directories(${OpenCV_INCLUDE_DIRS})
+
+add_executable(myopencv main.cpp)
+TARGET_LINK_LIBRARIES(myopencv /home/xu736946693/Desktop/myAlgorithm/build/bin/libmyAlgorithm_shared.so )
+target_link_libraries(myopencv ${OpenCV_LIBS})
