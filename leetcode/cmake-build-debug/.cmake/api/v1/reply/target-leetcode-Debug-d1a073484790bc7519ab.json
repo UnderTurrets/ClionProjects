@@ -11,6 +11,7 @@
 		"commands" : 
 		[
 			"add_executable",
+			"TARGET_LINK_LIBRARIES",
 			"INCLUDE_DIRECTORIES"
 		],
 		"files" : 
@@ -30,6 +31,12 @@
 			},
 			{
 				"command" : 1,
+				"file" : 0,
+				"line" : 7,
+				"parent" : 0
+			},
+			{
+				"command" : 2,
 				"file" : 0,
 				"line" : 5,
 				"parent" : 0
@@ -51,8 +58,8 @@
 			"includes" : 
 			[
 				{
-					"backtrace" : 2,
-					"path" : "/home/xu/Desktop/myAlgorithm/lib"
+					"backtrace" : 3,
+					"path" : "/home/xu736946693/Desktop/myAlgorithm/lib"
 				}
 			],
 			"language" : "CXX",
@@ -84,15 +91,12 @@
 				"role" : "flags"
 			},
 			{
-				"fragment" : "-L/home/xu/Desktop/myAlgorithm/build/bin",
-				"role" : "libraryPath"
-			},
-			{
-				"fragment" : "-Wl,-rpath,/home/xu/Desktop/myAlgorithm/build/bin",
+				"fragment" : "-Wl,-rpath,/home/xu736946693/Desktop/myAlgorithm/build/bin",
 				"role" : "libraries"
 			},
 			{
-				"fragment" : "-lmyAlgorithm_shared",
+				"backtrace" : 2,
+				"fragment" : "/home/xu736946693/Desktop/myAlgorithm/build/bin/libmyAlgorithm_shared.so",
 				"role" : "libraries"
 			}
 		],
