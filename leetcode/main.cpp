@@ -1,75 +1,5 @@
-#include<vector>
-#include<iostream>
-#include<memory>
-#include <myAlgorithm.h>
-using  namespace  std;
-
-class Solution {
-public:
-    bool find_repeat(vector<char> v){
-        vector<char> nums;bool ret =1;int x=0;
-        for(int i=0;i<v.size();i++){
-            if(v[i]>='0'&&v[i]<='9'){
-                nums.push_back(v[i]);
-            }
-        }
-        sort(nums.begin(),nums.end());
-        if(!nums.empty()) {
-            for (int i = 0; i < nums.size() - 1; i++) {
-                if (nums[i] == nums[i + 1]) {
-                    ret = 0;
-                    break;
-                }
-
-            }
-        }
-        return ret;
-    }
-    bool isValidSudoku(vector<vector<char>>& board) {
-        bool ret=1;
-        for(int i=0;i<board.size();i+=3){
-            for(int j=0;j<board[0].size();j+=3){
-                ret=find_repeat({board[i][j],board[i][j+1],board[i][j+2],board[i+1][j+1],board[i+1][j+2],board[i+1][j],board[i+2][j],board[i][j+1],board[i][j+2],});
-            }
-            if(ret==0){
-                break;
-            }
-        }
-        for(int i=0;i<board.size();i++){
-            ret=find_repeat({board[0][i],board[1][i],board[2][i],board[3][i],board[4][i],board[5][i],board[6][i],board[7][i],board[8][i],});
-            if(ret==0){
-                break;
-            }
-            ret=find_repeat({board[i][0],board[i][1],board[i][2],board[i][3],board[i][4],board[i][5],board[i][6],board[i][7],board[i][8],});
-            if(ret==0){
-                break;
-            }
-
-
-        }
-
-
-
-
-
-
-
-        return ret;
-    }
-};
-
-
-
-template<class T>
-void print_forward_vector (const vector<T>v ){
-    auto it =v.begin();
-    for(it;it!=v.end();it++){
-        cout<<*it<<ends;
-    }
-    cout<<endl;
-}
-using namespace std;
-
+#include <Tree.cpp>
+#include <leetcode.cpp>
 
 int main () {
 //    vector<int> nums1 = {1, 2, 2, 1};
@@ -192,17 +122,17 @@ int main () {
 //    }
 //    cout<<ret<<endl;
 
-    BinTree<int> origin;
-    origin.val=999;
-    BinTree<int> second_one;
-    origin.left=&second_one;
-    second_one.val=998;
-    BinTree<int> second_two;
-    origin.right=&second_two;
-    second_two.val=1000;
-    BinTree<int>origin2 (origin);
-    origin.insert(1,&origin);
-    origin.Travesal_levelorder();
+//    BinTree<int> origin;
+//    origin.val=999;
+//    BinTree<int> second_one;
+//    origin.left=&second_one;
+//    second_one.val=998;
+//    BinTree<int> second_two;
+//    origin.right=&second_two;
+//    second_two.val=1000;
+//    BinTree<int>origin2 (origin);
+//    origin.insert(1);
+//    origin.Travesal_levelorder();
 
 
 //vector<int> vector1={1,2,3,4,5,6,7,8,9,};
@@ -222,4 +152,6 @@ int main () {
 //minHeap2.print_heap();
 //MinHeap<int>minHeap3=minHeap2;
 //minHeap3.print_heap();
+vector<int>v1={3,0,1,0,};
+    topKFrequent(v1,1);
 }

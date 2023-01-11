@@ -1,3 +1,3 @@
-/home/xu/CLionProjects/opencvSample/cmake-build-debug/CMakeFiles/opencv.dir
-/home/xu/CLionProjects/opencvSample/cmake-build-debug/CMakeFiles/edit_cache.dir
-/home/xu/CLionProjects/opencvSample/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/xu736946693/Desktop/ClionProjects/opencvSample/cmake-build-debug/CMakeFiles/opencv.dir
+/home/xu736946693/Desktop/ClionProjects/opencvSample/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/xu736946693/Desktop/ClionProjects/opencvSample/cmake-build-debug/CMakeFiles/rebuild_cache.dir
