@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/g++
 CXX_DEFINES = 
 
-CXX_INCLUDES = -isystem /usr/local/include/opencv4
+CXX_INCLUDES = -I/home/xu736946693/Desktop/OpenCVLibrary/src/lib -isystem /usr/local/include/opencv4
 
 CXX_FLAGS = -g -std=gnu++17
 

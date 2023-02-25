@@ -54,10 +54,10 @@ RM = /home/xu736946693/CLion-2022.2.4/clion-2022.2.4/bin/cmake/linux/bin/cmake -
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/xu736946693/Desktop/ClionProjects/opencvSample
+CMAKE_SOURCE_DIR = /home/xu736946693/Desktop/CLionProjects/opencvSample
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/xu736946693/Desktop/ClionProjects/opencvSample/cmake-build-debug
+CMAKE_BINARY_DIR = /home/xu736946693/Desktop/CLionProjects/opencvSample/cmake-build-debug
 
 #=============================================================================
 # Directory level rules for the build root directory
@@ -81,14 +81,14 @@ clean: CMakeFiles/opencv.dir/clean
 CMakeFiles/opencv.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/opencv.dir/build.make CMakeFiles/opencv.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/opencv.dir/build.make CMakeFiles/opencv.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/xu736946693/Desktop/ClionProjects/opencvSample/cmake-build-debug/CMakeFiles --progress-num=1,2 "Built target opencv"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/xu736946693/Desktop/CLionProjects/opencvSample/cmake-build-debug/CMakeFiles --progress-num=1,2 "Built target opencv"
 .PHONY : CMakeFiles/opencv.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/opencv.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/xu736946693/Desktop/ClionProjects/opencvSample/cmake-build-debug/CMakeFiles 2
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/xu736946693/Desktop/CLionProjects/opencvSample/cmake-build-debug/CMakeFiles 2
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/opencv.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/xu736946693/Desktop/ClionProjects/opencvSample/cmake-build-debug/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/xu736946693/Desktop/CLionProjects/opencvSample/cmake-build-debug/CMakeFiles 0
 .PHONY : CMakeFiles/opencv.dir/rule
 
 # Convenience name for target.

@@ -1,116 +1,194 @@
-#include <bits/stdc++.h>
-#include <opencv2/opencv.hpp>
-
-using namespace std;
-using namespace cv;
-
-
-void PrintMs ( ){
-    static short i =1;static long long last =0;
-    long long current=cv::getTickCount();
-    if(i%2==1){
-        last =0;
-        cout<<"开始计时"<<endl;
-    }else{
-        i-=2;
-        cout<<"结束计时 ";
-    }
-    if (last==0){
-        last = current;
-        i++;
-        return;
-    }
-    double result = (double)((current-last)/cv::getTickFrequency())*1000;
-    i++;
-    cout<<"间隔："<<result<<"ms"<<endl;
-}
-
-
-void drawRotatedRect(InputOutputArray img, RotatedRect rRect,const Scalar& color, int thickness = 1,int lineType = LINE_8, int shift = 0){
-    Point2f vertices[4];
-    rRect.points(vertices);
-    for(int i=0;i<4;i++){
-        line(img,vertices[i],vertices[(i+1)%4],color,lineType,shift);
-    }
-}
-
-
-class TrackbarUserdata{
-public:
-    Mat input;
-    Mat output;
-    int angle=0;
-    string winname;
-};
-
-
-void RotateonChange(int,void *userdata) {
-
-    TrackbarUserdata *data = (TrackbarUserdata *) userdata;
-    int rows = data->input.rows;
-    int cols = data->output.cols;
-    Mat M = getRotationMatrix2D(Point2f(rows / 2, cols / 2), data->angle, 1);
-    warpAffine(data->input,data->output,M,data->input.size());
-    imshow(data->winname,data->output);
-    waitKey(10);
-}
-
-void addSaltNoise(const Mat& src,Mat& dst,int num=1000){
-    int total=src.cols*src.rows;
-    if(num>total){
-        cout<<"The inputarray doesn't have enough pixel."<<endl;
-        return;
-    }
-    dst=src.clone();
-    for (int k = 0; k < num; k++)
-    {
-        //随机取值行列，得到像素点(i,j)
-        int i = rand() % dst.rows;
-        int j = rand() % dst.cols;
-        //修改像素点(i,j)的像素值
-        for(int channel=0;channel<src.channels();channel++){
-            dst.ptr(i,j)[channel]=255;
-        }
-    }
-    for (int k = 0; k < num; k++)
-    {
-        //随机取值行列
-        int i = rand() % dst.rows;
-        int j = rand() % dst.cols;
-        //修改像素点(i,j)的像素值
-        for(int channel=0;channel<src.channels();channel++){
-            dst.ptr(i,j)[channel]=0;
-        }
-    }
-    return;
-}
-
-void addGaussianNoise(const Mat& src,Mat& dst,InputArray meanValue=10,InputArray std=36){
-    dst=src.clone();
-
-    //构造高斯噪声矩阵
-    Mat noise(dst.size(),dst.type());
-    RNG rng(time(NULL));
-    rng.fill(noise, RNG::NORMAL, meanValue, std);
-
-    //将高斯噪声矩阵与原图像叠加得到含噪图像
-    dst+=noise;
-
-    return ;
-}
-
+#include <OpenCVLibrary.h>
 
 int main() {
     try {
         Mat xuenai = imread("xuenai.jpg");
-        resize(xuenai,xuenai,Size(1000,1000));
-        imshow("xuenai",xuenai);
-        Mat xuenai_Salt;
-        addSaltNoise(xuenai,xuenai_Salt,2000);
-        imshow("xuenai_salt",xuenai_Salt);
-        Mat xuenai_gauss;
-        addGaussianNoise(xuenai,xuenai_gauss);
-        imshow("xuenai_Gauss",xuenai_gauss);
+        Mat xuenai_rect = imread("xuenai_rect.jpg");
+        Mat xuenai_rect_gray;
+        cvtColor(xuenai_rect,xuenai_rect_gray,COLOR_BGR2GRAY);
+        imshow("xuenai", xuenai);
+        namedWindow("panel");
+        createTrackbar("threshold","panel", nullptr,255);
+        createTrackbar("angle","panel", nullptr,360);
+        createTrackbar("width","panel", nullptr,1000);
+        createTrackbar("height","panel", nullptr,1000);
+
+        while (true) {
+            int thres = getTrackbarPos("threshold", "panel");
+            if(thres==0)thres=100;
+            int width = getTrackbarPos("width", "panel");
+            if(width==0)width=xuenai.cols;
+            int height = getTrackbarPos("height", "panel");
+            if(height==0)height=xuenai.rows;
+            int angle = getTrackbarPos("angle","panel");
+
+            Mat xuenai_transform=xuenai.clone();
+
+            resize(xuenai_transform,xuenai_transform,Size(width,height));
+
+            Mat M= getRotationMatrix2D(Point2f((float )xuenai_transform.cols/2,(float )xuenai_transform.rows/2),angle,1);
+            warpAffine(xuenai_transform,xuenai_transform,M,xuenai_transform.size());
+
+            Mat xuenai_gray(xuenai.size(),xuenai.type());
+            cvtColor(xuenai_transform,xuenai_gray,COLOR_BGR2GRAY);
+
+            //准备工作
+            Ptr<ORB>obr=ORB::create();
+            vector<KeyPoint>xuenai_ObrKp;
+            Mat BFMmatch_result;Mat FLANNmatch_result;
+            vector<KeyPoint>xuenai_rect_ObrKp;
+            Mat xuenai_obr_descriptorsForBF;Mat xuenai_rect_obr_descriptorsForBF;Mat xuenai_obr_descriptorsForFLANN;Mat xuenai_rect_obr_descriptorsForFLANN;
+            vector<vector<DMatch>>xuenai_BFMmatch_results;vector<vector<DMatch>>xuenai_FLANNmatch_results;
+            obr->detectAndCompute(xuenai_gray,noArray(),xuenai_ObrKp,xuenai_obr_descriptorsForBF);
+            obr->detectAndCompute(xuenai_rect_gray,noArray(),xuenai_rect_ObrKp,xuenai_rect_obr_descriptorsForBF);
+            xuenai_obr_descriptorsForBF.convertTo(xuenai_obr_descriptorsForFLANN,CV_32F);
+            xuenai_rect_obr_descriptorsForBF.convertTo(xuenai_rect_obr_descriptorsForFLANN,CV_32F);
+
+            //进行匹配
+            Ptr<BFMatcher>bfm=BFMatcher::create(NORM_HAMMING);
+            Ptr<FlannBasedMatcher>flann=FlannBasedMatcher::create();
+            bfm->knnMatch(xuenai_rect_obr_descriptorsForBF,xuenai_obr_descriptorsForBF,xuenai_BFMmatch_results,2);
+            flann->knnMatch(xuenai_rect_obr_descriptorsForFLANN,xuenai_obr_descriptorsForFLANN,xuenai_FLANNmatch_results,2);
+
+            //比率检验
+            vector<DMatch>goodBFMresult,goodFLANNresult;
+            for(auto match_result:xuenai_BFMmatch_results){
+                if(match_result.size()>1 && match_result[0].distance<0.7*match_result[1].distance ){
+                    goodBFMresult.push_back(match_result[0]);
+                }
+            }
+            for(auto match_result:xuenai_FLANNmatch_results){
+                if(match_result.size()>1 && match_result[0].distance<0.7*match_result[1].distance ){
+                    goodFLANNresult.push_back(match_result[0]);
+                }
+            }
+
+            //绘制匹配结果
+            if(!goodBFMresult.empty()) {
+                drawMatches(xuenai_rect, xuenai_rect_ObrKp,
+                            xuenai_transform, xuenai_ObrKp,
+                            goodBFMresult, BFMmatch_result,
+                            Scalar::all(-1), Scalar::all(-1), vector<char>(),
+                            DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS);
+                imshow("BFMmatch_result",BFMmatch_result);
+
+            }
+            if(!goodFLANNresult.empty()) {
+                drawMatches(xuenai_rect, xuenai_rect_ObrKp,
+                            xuenai_transform, xuenai_ObrKp,
+                            goodFLANNresult, FLANNmatch_result,
+                            Scalar::all(-1), Scalar::all(-1), vector<char>(),
+                            DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS);
+                imshow("FLANNmatch_result",FLANNmatch_result);
+            }
+
+
+//            Mat fast_result=xuenai_transform.clone(),obr_result=xuenai_transform.clone();
+//            drawKeypoints(fast_result,fast_kp,fast_result,Scalar::all(-1),DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
+//            drawKeypoints(obr_result,xuenai_ObrKp,obr_result,Scalar::all(-1),DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
+//            imshow("fast_result",fast_result);
+//            imshow("obr_result",obr_result);
+
+
+
+
+//            Ptr<SIFT> sift=SIFT::create();
+//            Ptr<SURF> surf=SURF::create();
+//            vector<KeyPoint>sift_kp,surf_kp;
+//            sift->detect(xuenai_gray,sift_kp);
+//            surf->detect(xuenai_gray,surf_kp);
+//
+//            Mat sift_result=xuenai_transform.clone(),surf_result=xuenai_transform.clone();
+//            drawKeypoints(sift_result,sift_kp,sift_result,Scalar::all(-1),DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
+//            drawKeypoints(surf_result,surf_kp,surf_result,Scalar::all(-1),DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
+//            imshow("sift_result",sift_result);
+//            imshow("surf_result",surf_result);
+
+
+
+
+
+
+
+//            vector<Point2f>xuenai_cornersSet;
+//            goodFeaturesToTrack(xuenai_gray,xuenai_cornersSet,0,0.1,10);
+//            for(auto corner:xuenai_cornersSet){
+//                circle(xuenai_transform,corner,3,Scalar(0,0,255),-1);
+//            }
+
+            //cornerHarris(xuenai_gray,xuenai_corners,2,3,0.04);
+//            normalize(xuenai_corners,xuenai_corners,0,255,NORM_MINMAX,-1);
+//            convertScaleAbs(xuenai_corners,xuenai_corners);
+//            Mat harris_result=xuenai_transform.clone();
+//            for(int i=0;i<xuenai_corners.rows;i++){
+//                uchar * ptr =xuenai_corners.ptr(i);
+//                for(int j=0;j<xuenai_corners.cols;j++){
+//                    int value=(int) *ptr;
+//                    if(value>thres){
+//                        circle(harris_result, Point(j,i), 3, Scalar(0, 0, 255));
+//                    }
+//                    ptr++;
+//                }
+//            }
+
+
+
+
+//            imshow("xuenai_corners",xuenai_transform);
+            if (waitKey(0) == 'q')break;
+        }
+
+
+//        for(int i=0;i<xuenai.cols;i++){
+//            for(int j=0;j<xuenai.rows;j++){
+//                if(xuenai_corners.ptr(i,j)[0]>100){
+//                    circle(xuenai, Point(i,j), 3, Scalar(0, 0, 255));
+//                }
+//            }
+//        }
+//        imshow("xuenai_corners", xuenai);
+
+
+
+
+
+
+
+
+
+
+
+
+//        rotate(xuenai,xuenai,ROTATE_90_CLOCKWISE);
+//        resize(xuenai,xuenai,Size(500,500));
+//        Mat templ= imread("xuenai_rect.jpg");
+//        imshow("template",templ);
+//        Mat match_result;
+//        matchTemplate(xuenai,templ,match_result,TM_SQDIFF);
+//        Point temLoc;
+//        Point minLoc;
+//        Point maxLoc;
+//        double min,max;
+//        minMaxLoc(match_result,&min,&max,&minLoc,&maxLoc);
+//        temLoc=minLoc;
+//        rectangle(xuenai,Rect(temLoc.x,temLoc.y,templ.cols,templ.rows),Scalar(0,0,255));
+//        imshow("xuenai_match",xuenai);
+
+
+
+
+
+
+
+//        Mat xuenai_rect(xuenai,Rect(Point(0,100),Point(400,600)));
+//        if(imread("xuenai_rect.jpg").empty())imwrite("xuenai_rect.jpg",xuenai_rect);
+
+//        Mat xuenai_Salt;
+//        addSaltNoise(xuenai,xuenai_Salt,2000);
+//        imshow("xuenai_salt",xuenai_Salt);
+//        Mat xuenai_gauss;
+//        addGaussianNoise(xuenai,xuenai_gauss);
+//        imshow("xuenai_Gauss",xuenai_gauss);
 
 //    Mat xuenai_canny(xuenai.size(),xuenai.type());
 //    Canny(xuenai,xuenai_canny,60,150);
